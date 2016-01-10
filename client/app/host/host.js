@@ -7,7 +7,11 @@ angular.module('foodbnb.host', [])
     .then(function (response) {
       console.log("Successful Post");   
     });
-  };  
+  };
+  //Need a new function to format the address into
+  //String with plus sign instead of spaces
+  //No need for commas
+
 })
 .controller('formCtrl', function ($scope) {
 
