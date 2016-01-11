@@ -5,6 +5,9 @@ angular.module('foodbnb.host', [])
   $scope.event = {};
   $scope.resetForm = function () {
     console.log("Reset");
+    //Scroll to the top of the page
+    $("html, body").animate({ scrollTop: 0 }, "slow");
+
     $scope.$broadcast('show-errors-reset');
   };
   $scope.newEvent = function (){
@@ -30,6 +33,10 @@ angular.module('foodbnb.host', [])
       console.log("Address Response: ", response);  
       if (response !== 'ROOFTOP') {
         console.log("Invalid Address");
+        //Apply Style to all addresses
+        $('.address').toggleClass('has-error');
+        $("<div class= 'has-error'><p class='help-block'>Invalid Address</p></div>").insertAfter('.guests');
+
         return false;
       } else {
         return true;
@@ -55,7 +62,7 @@ angular.module('foodbnb.host', [])
 
   
 }).
-directive('showErrors', function() {
+directive('showErrors', function ($timeout) {
   return {
     // Uses Attribute to match directive
     restrict: 'A',
@@ -74,19 +81,26 @@ directive('showErrors', function() {
         el.toggleClass('has-error', formCtrl[inputName].$invalid);
       });
 
+      //Event Listener to Reset Fields
+      scope.$on('show-errors-reset', function() {
+        console.log("Listener Activated");
+        
+        //Using elem  
+        el.children()[0].value = '';
+        $timeout(function() {
+          el.removeClass('has-error');
+        }, 0, false);
+        
+      });
+
       //Event Listener to toggle all validity checks
       scope.$on('show-errors-check-validity', function() {
         el.toggleClass('has-error', formCtrl[inputName].$invalid);
       });
 
-      //Event Listener to Reset Fields
-      scope.$on('show-errors-reset', function() {
-        $timeout(function() {
-          el.removeClass('has-error');
-        }, 0, false);
-      });
 
     }
+
   };
 });
 
