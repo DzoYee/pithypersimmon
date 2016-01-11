@@ -1,3 +1,12 @@
 li {
   display: inline-block;
 }
+
+/*Only Displays the error paragraph if the form group div has the #hasError class*/
+.form-group .help-block {
+  display: none;
+}
+
+.form-group.has-error .help-block {
+  display: block;
+}

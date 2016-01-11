@@ -3,9 +3,20 @@
 angular.module('foodbnb.host', [])
 .controller('hostCtrl', function ($scope, Events) {
   $scope.event = {};
+  $scope.resetForm = function () {
+    console.log("Reset");
+    $scope.$broadcast('show-errors-reset');
+  };
   $scope.newEvent = function (){
-    console.log($scope.event);
 
+    //Broadcast the event to all divs containing show-Errors
+    $scope.$broadcast('show-errors-check-validity');
+
+
+    // Stops if any fields are invalid
+    if ($scope.form.$invalid) { console.log("Missing Fields"); return; }
+
+    console.log($scope.event);
     /*Concatenates and replaces space with plus signs to 
     create a complete address for google geocode api*/
     var address = "" + $scope.event.address + "+" + $scope.event.city + 
@@ -33,6 +44,7 @@ angular.module('foodbnb.host', [])
         }); 
       }
     });  
+
   };
 
   var clearFields = function () {
@@ -42,7 +54,42 @@ angular.module('foodbnb.host', [])
   };
 
   
+}).
+directive('showErrors', function() {
+  return {
+    // Uses Attribute to match directive
+    restrict: 'A',
+    require:  '^form',
+    link: function (scope, el, attrs, formCtrl) {
+      // find the text box element, which has the 'name' attribute
+      var inputEl   = el[0].querySelector("[name]");
+      // convert the native text box element to an angular element
+      var inputNgEl = angular.element(inputEl);
+      // get the name on the text box so we know the property to check
+      // on the form controller
+      var inputName = inputNgEl.attr('name');
+
+      // only apply the has-error class after the user leaves the text box
+      inputNgEl.bind('blur', function() {
+        el.toggleClass('has-error', formCtrl[inputName].$invalid);
+      });
+
+      //Event Listener to toggle all validity checks
+      scope.$on('show-errors-check-validity', function() {
+        el.toggleClass('has-error', formCtrl[inputName].$invalid);
+      });
+
+      //Event Listener to Reset Fields
+      scope.$on('show-errors-reset', function() {
+        $timeout(function() {
+          el.removeClass('has-error');
+        }, 0, false);
+      });
+
+    }
+  };
 });
+
 
 
 // {
